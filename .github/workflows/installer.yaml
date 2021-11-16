@@ -112,7 +112,7 @@ jobs:
           # FIXME Why isn't the zinit.git/ dir not getting uploaded?
           path: |
             C:\tools\cygwin\home\runneradmin\.zshrc
-            C:\tools\cygwin\home\runneradmin\.local\.share\zinit\zinit.git
+            C:\tools\cygwin\home\runneradmin\.local\.share\zinit\zinit.git\
 
       - name: Test zinit install (linux/macOS)
         if: "!startsWith(matrix.os, 'windows')"
