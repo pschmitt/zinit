@@ -3048,8 +3048,9 @@ EOF
 
     if [[ "$user" != "_local" && -n "$user" ]]; then
         builtin print "Your repository is ready\!"
-        builtin print "An MIT LICENSE file has been placed - please review the " \
-                      "license terms to see if they fit your new project:"
+        builtin print "An MIT LICENSE file has been placed in your repo - please " \
+                      "review the license terms to see if they fit your new " \
+                      "project, or choose a new license:"
         builtin print "- https://choosealicense.com/"
         builtin print "Remote repository $uspl2col set up as origin."
         builtin print "You're in plugin's local folder, the files aren't added to git."
