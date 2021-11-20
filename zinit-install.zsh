@@ -521,6 +521,15 @@ builtin source "${ZINIT[BIN_DIR]}/zinit-side.zsh" || { builtin print -P "${ZINIT
         { SKIPPED_COMPS=( "${(@f)$(<${TMPDIR:-/tmp}/zinit.skipped_comps.$$.lst)}" ) } 2>/dev/null
     }
 
+    # Install manpages if any
+    [[ 0 = ${+ICE[nomanpages]} && ${ICE[as]} != null && ${+ICE[null]} -eq 0 ]] && \
+        .zinit-install-manpages "$id_as" "" "0"
+
+    if [[ -e ${TMPDIR:-/tmp}/zinit.installed_manpages.$$.lst ]] {
+        typeset -ga INSTALLED_MANPAGES
+        { INSTALLED_MANPAGES=( "${(@f)$(<${TMPDIR:-/tmp}/zinit.installed_manpages.$$.lst)}" ) } 2>/dev/null
+    }
+
     if [[ -e ${TMPDIR:-/tmp}/zinit.compiled.$$.lst ]] {
         typeset -ga ADD_COMPILED
         { ADD_COMPILED=( "${(@f)$(<${TMPDIR:-/tmp}/zinit.compiled.$$.lst)}" ) } 2>/dev/null
@@ -544,6 +553,84 @@ builtin source "${ZINIT[BIN_DIR]}/zinit-side.zsh" || { builtin print -P "${ZINIT
 # $2 - plugin (only when $1 - i.e. user - given)
 # $3 - if 1, then reinstall, otherwise only install completions that aren't there
 .zinit-install-completions() {
+    builtin emulate -LR zsh
+    setopt nullglob extendedglob warncreateglobal typesetsilent noshortloops
+
+    local id_as=$1${2:+${${${(M)1:#%}:+$2}:-/$2}}
+    local reinstall=${3:-0} quiet=${${4:+1}:-0}
+    (( OPTS[opt_-q,--quiet] )) && quiet=1
+    [[ $4 = -Q ]] && quiet=2
+    typeset -ga INSTALLED_COMPS SKIPPED_COMPS
+    INSTALLED_COMPS=() SKIPPED_COMPS=()
+
+    .zinit-any-to-user-plugin "$id_as" ""
+    local user=${reply[-2]}
+    local plugin=${reply[-1]}
+    .zinit-any-colorify-as-uspl2 "$user" "$plugin"
+    local abbrev_pspec=$REPLY
+
+    .zinit-exists-physically-message "$id_as" "" || return 1
+
+    # Symlink any completion files included in plugin's directory
+    typeset -a completions already_symlinked backup_comps
+    local c cfile bkpfile
+    # The plugin == . is a semi-hack/trick to handle `creinstall .' properly
+    [[ $user == % || ( -z $user && $plugin == . ) ]] && \
+        completions=( "${plugin}"/**/_[^_.]*~*(*.zwc|*.html|*.txt|*.png|*.jpg|*.jpeg|*.js|*.md|*.yml|*.ri|_zsh_highlight*|/zsdoc/*|*.ps1)(DN^/) ) || \
+        completions=( "${ZINIT[PLUGINS_DIR]}/${id_as//\//---}"/**/_[^_.]*~*(*.zwc|*.html|*.txt|*.png|*.jpg|*.jpeg|*.js|*.md|*.yml|*.ri|_zsh_highlight*|/zsdoc/*|*.ps1)(DN^/) )
+    already_symlinked=( "${ZINIT[COMPLETIONS_DIR]}"/_[^_.]*~*.zwc(DN) )
+    backup_comps=( "${ZINIT[COMPLETIONS_DIR]}"/[^_.]*~*.zwc(DN) )
+
+    # Symlink completions if they are not already there
+    # either as completions (_fname) or as backups (fname)
+    # OR - if it's a reinstall
+    for c in "${completions[@]}"; do
+        cfile="${c:t}"
+        bkpfile="${cfile#_}"
+        if [[ ( -z ${already_symlinked[(r)*/$cfile]} || $reinstall = 1 ) &&
+              -z ${backup_comps[(r)*/$bkpfile]}
+        ]]; then
+            if [[ $reinstall = 1 ]]; then
+                # Remove old files
+                command rm -f "${ZINIT[COMPLETIONS_DIR]}/$cfile" "${ZINIT[COMPLETIONS_DIR]}/$bkpfile"
+            fi
+            INSTALLED_COMPS+=( $cfile )
+            (( quiet )) || builtin print -Pr "Symlinking completion ${ZINIT[col-uname]}$cfile%f%b to completions directory."
+            command ln -fs "$c" "${ZINIT[COMPLETIONS_DIR]}/$cfile"
+            # Make compinit notice the change
+            .zinit-forget-completion "$cfile" "$quiet"
+        else
+            SKIPPED_COMPS+=( $cfile )
+            (( quiet )) || builtin print -Pr "Not symlinking completion \`${ZINIT[col-obj]}$cfile%f%b', it already exists."
+            (( quiet )) || builtin print -Pr "${ZINIT[col-info2]}Use \`${ZINIT[col-pname]}zinit creinstall $abbrev_pspec${ZINIT[col-info2]}' to force install.%f%b"
+        fi
+    done
+
+    if (( quiet == 1 && (${#INSTALLED_COMPS} || ${#SKIPPED_COMPS}) )) {
+        +zinit-message "{msg}Installed {num}${#INSTALLED_COMPS}" \
+            "{msg}completions. They are stored in the{var}" \
+            "\$INSTALLED_COMPS{msg} array."
+        if (( ${#SKIPPED_COMPS} )) {
+            +zinit-message "{msg}Skipped installing" \
+                "{num}${#SKIPPED_COMPS}{msg} completions." \
+                "They are stored in the {var}\$SKIPPED_COMPS{msg} array."
+        }
+    }
+
+    if (( ZSH_SUBSHELL )) {
+        builtin print -rl -- $INSTALLED_COMPS >! ${TMPDIR:-/tmp}/zinit.installed_comps.$$.lst
+        builtin print -rl -- $SKIPPED_COMPS >! ${TMPDIR:-/tmp}/zinit.skipped_comps.$$.lst
+    }
+
+    .zinit-compinit 1 1 &>/dev/null
+} # ]]]
+# FUNCTION: .zinit-install-manpages [[[
+# Installs any manpage found in the repo of a given plugin.
+#
+# $1 - plugin spec (4 formats: user---plugin, user/plugin, user, plugin)
+# $2 - plugin (only when $1 - i.e. user - given)
+# $3 - if 1, then reinstall, otherwise only install manpages that aren't there
+.zinit-install-manpages() {
     builtin emulate -LR zsh
     setopt nullglob extendedglob warncreateglobal typesetsilent noshortloops
 
