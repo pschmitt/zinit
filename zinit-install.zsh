@@ -630,6 +630,7 @@ builtin source "${ZINIT[BIN_DIR]}/zinit-side.zsh" || { builtin print -P "${ZINIT
 # $1 - plugin spec (4 formats: user---plugin, user/plugin, user, plugin)
 # $2 - plugin (only when $1 - i.e. user - given)
 # $3 - if 1, then reinstall, otherwise only install manpages that aren't there
+# $4 - if 1, then be quiet. Do not output anything.
 .zinit-install-manpages() {
     builtin emulate -LR zsh
     setopt nullglob extendedglob warncreateglobal typesetsilent noshortloops
