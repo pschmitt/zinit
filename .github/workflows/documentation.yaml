@@ -66,3 +66,11 @@ jobs:
           name: docs
           path: |
             /tmp/doc.tar.gz
+
+      - name: Check if the zsd need to be updated
+        run: |
+          if ! git --no-pager diff
+          then
+            echo "The docs in the repo are not up to date" >&2
+            exit 1
+          fi
