@@ -1,5 +1,5 @@
 name: documentation
-on: [push]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   # gh-pages:
@@ -68,8 +68,12 @@ jobs:
             /tmp/doc.tar.gz
 
       - name: Check if the zsd need to be updated
+      # NOTE: We need to run git diff twice here since w/o --quiet it's RC
+      # is always 0. The first is to display the diff output, the second one
+      # to test whether the diff is empty.
         run: |
-          if ! git --no-pager diff
+          git --no-pager diff
+          if ! git --no-pager diff --quiet
           then
             echo "The docs in the repo are not up to date" >&2
             exit 1
