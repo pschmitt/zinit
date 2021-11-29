@@ -2,33 +2,10 @@ name: documentation
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  # gh-pages:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         fetch-depth: 0
-  #
-  #     - uses: actions/setup-python@v2
-  #       with:
-  #         python-version: '3.x'
-  #
-  #     - name: Install mkdocs
-  #       run: |
-  #         pip install mkdocs mkdocs-material
-  #
-  #     # TODO GPG signing
-  #     - name: Publish to gh-pages
-  #       run: |
-  #         cd doc/gh-pages
-  #         git config user.name github-actions
-  #         git config user.email github-actions@github.com
-  #         make gh-pages
-
   zshelldoc:
     runs-on: ubuntu-latest
     steps:
-      - name: Install zshelldoc
+      - name: 📦 Install zshelldoc
         run: |
           sudo apt-get install -y zsh
           git clone https://github.com/zdharma-continuum/zshelldoc.git /tmp/zsd.git
@@ -36,45 +13,51 @@ jobs:
           sudo make install
           zsd --help
 
-      - uses: ruby/setup-ruby@v1
+      - name: ♦️ Setup ruby
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.6
           bundler-cache: true
 
-      - name: Install asciidoctor-pdf
+      - name: 📄 Install asciidoctor-pdf
         run: |
           gem install asciidoctor-pdf
 
-      - name: Check out repository code
+      - name: 📡 Check out repository code
         uses: actions/checkout@v2
 
-      - name: make doc
+      - name: 👷 Generate zsd
         run: |
           make doc
 
-      - name: make pdf
+      - name: 📇 make pdf
         run: |
           make -C doc/zsdoc pdf
 
-      - name: Tar doc/
+      - name: 🗄️ Tar doc/
         run: |
           tar cvzf /tmp/doc.tar.gz doc
 
-      - name: Upload doc.tar.gz
+      - name: ✉️ Upload doc.tar.gz
         uses: actions/upload-artifact@v2
         with:
           name: docs
           path: |
             /tmp/doc.tar.gz
 
-      - name: Check if the zsd need to be updated
+      - name: 🕵️ Check if the zsd docs need to be updated
       # NOTE: We need to run git diff twice here since w/o --quiet it's RC
       # is always 0. The first is to display the diff output, the second one
       # to test whether the diff is empty.
         run: |
           git --no-pager diff
-          if ! git --no-pager diff --quiet
+          if git --no-pager diff --quiet
           then
-            echo "The docs in the repo are not up to date" >&2
+            echo "✅ The zshelldocs are up to date"
+          else
+            {
+              echo "❌ The zshelldocs in the repo are not up to date"
+              echo 'Please regenerate them with $ make doc'
+            } >&2
             exit 1
           fi
