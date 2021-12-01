@@ -1,0 +1,12 @@
+on:
+  discussion:
+    types: [created, edited, pinned]
+
+
+jobs:
+  gitter-im-broadcast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📣 Broadcast announcement
+        run: |
+          echo 'New discussion!'
