@@ -1,4 +1,4 @@
-name: 📣 GitHub discussions annoucements
+name: 📣 Annoucements
 on:
   discussion:
     types: [created, edited, pinned]
