@@ -11,3 +11,6 @@ jobs:
       - name: 📣 Broadcast announcement
         run: |
           echo 'New discussion!'
+          echo "$GITHUB"
+          echo "$GITHUB_EVENT"
+          cat "$GITHUB_EVENT_PATH"
