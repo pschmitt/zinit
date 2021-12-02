@@ -16,18 +16,31 @@ jobs:
           BODY="$(jq -er '.discussion.body' "$GITHUB_EVENT_PATH")"
           URL="$(jq -er '"https://github.com/" + .discussion.html_url' "$GITHUB_EVENT_PATH")"
           echo -e "New announcement: ${TITLE}\n${BODY}\nURL: ${URL}" >&2
-          echo "::set-output name=announcement-title::${TITLE}"
-          echo "::set-output name=announcement-body::${BODY}"
-          echo "::set-output name=announcement-url::${URL}"
+          echo "::set-output name=title::${TITLE}"
+          echo "::set-output name=body::${BODY}"
+          echo "::set-output name=url::${URL}"
 
-      - id: initial
-        uses: juztcode/gitter-github-action@v1
-        if: success()
+      # - id: initial
+      #   uses: juztcode/gitter-github-action@v1
+      #   if: success()
+      #   with:
+      #     room-id: ${{ secrets.GITTER_ROOM_ID }}
+      #     token: ${{ secrets.GITTER_PERSONAL_ACCESS_TOKEN }}
+      #     text: |
+      #       ** 📣 ${{ steps.annoucement.outputs.announcement-title }}**
+      #       ${{ steps.annoucement.outputs.announcement-body }}
+      #
+      #       url: ${{ steps.annoucement.outputs.announcement-url }}
+
+      - name: Send notification to Matrix channel
+        id: matrix-chat-message
+        uses: fadenb/matrix-chat-message@v0.0.6
         with:
-          room-id: ${{ secrets.GITTER_ROOM_ID }}
-          token: ${{ secrets.GITTER_PERSONAL_ACCESS_TOKEN }}
-          text: |
-            ** 📣 ${{ steps.annoucement.outputs.announcement-title }}**
-            ${{ steps.annoucement.outputs.announcement-body }}
+          homeserver: 'matrix.org'
+          token: ${{ secrets.MATRIX_TOKEN }}
+          channel: '!TUvDMcvtEjDISwdmaq:gitter.im'
+          message: |
+            ** 📣 ${{ steps.announcement.outputs.title }}**
+            ${{ steps.announcement.outputs.body }}
 
-            url: ${{ steps.annoucement.outputs.announcement-url }}
+            url: ${{ steps.announcement.outputs.url }}
