@@ -18,18 +18,17 @@ jobs:
 
           echo -e "New announcement: ${TITLE}\n${BODY}\nURL: ${URL}" >&2
 
-          outputenc() { sed -z -e 's#\%#%25#g; s#\\n#%0A#g; s#\\r#%0D#g'; }
+          echo "TITLE<<EOF" >> $GITHUB_ENV
+          echo "$TITLE" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
-          TITLE="$(outputenc <<< "$TITLE")"
-          BODY="$(outputenc <<< "$BODY")"
-          URL="$(outputenc <<< "$URL")"
+          echo "BODY<<EOF" >> $GITHUB_ENV
+          echo "$BODY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
-          echo -e "New announcement (encoded for GH):" \
-                  "${TITLE}\n${BODY}\nURL: ${URL}" >&2
-
-          echo "::set-output name=title::${TITLE}"
-          echo "::set-output name=body::${BODY}"
-          echo "::set-output name=url::${URL}"
+          echo "URL<<EOF" >> $GITHUB_ENV
+          echo "$URL" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: ⏩ Send notification to Gitter channel
         id: matrix-chat-message
@@ -39,7 +38,7 @@ jobs:
           token: ${{ secrets.MATRIX_TOKEN }}
           channel: '!TUvDMcvtEjDISwdmaq:gitter.im'
           message: |
-            ** 📣 ${{ steps.announcement.outputs.title }}**
-            ${{ steps.announcement.outputs.body }}
+            **📣 ${{ env.TITLE }}**
+            ${{ env.BODY }}
 
-            ${{ steps.announcement.outputs.url }}
+            ${{ env.URL }}
