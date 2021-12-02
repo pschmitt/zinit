@@ -27,5 +27,5 @@ jobs:
         if: success()
         with:
           room-id: ${{ secrets.GITTER_ROOM_ID }}
-          token: ${{ secrets.GITTER_TOKEN }}
+          token: ${{ secrets.GITTER_PERSONAL_ACCESS_TOKEN }}
           text: ${{ steps.annoucement.outputs.title }}
