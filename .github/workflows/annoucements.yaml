@@ -15,7 +15,18 @@ jobs:
           TITLE="$(jq -er '.discussion.title' "$GITHUB_EVENT_PATH")"
           BODY="$(jq -er '.discussion.body' "$GITHUB_EVENT_PATH")"
           URL="$(jq -er '.discussion.html_url' "$GITHUB_EVENT_PATH")"
+
           echo -e "New announcement: ${TITLE}\n${BODY}\nURL: ${URL}" >&2
+
+          outputenc() { sed -z -e 's#\%#%25#g; s#\\n#%0A#g; s#\\r#%0D#g'; }
+
+          TITLE="$(outputenc <<< "$TITLE")"
+          BODY="$(outputenc <<< "$BODY")"
+          URL="$(outputenc <<< "$URL")"
+
+          echo -e "New announcement (encoded for GH):" \
+                  "${TITLE}\n${BODY}\nURL: ${URL}" >&2
+
           echo "::set-output name=title::${TITLE}"
           echo "::set-output name=body::${BODY}"
           echo "::set-output name=url::${URL}"
