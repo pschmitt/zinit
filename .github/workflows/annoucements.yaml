@@ -9,8 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 📣 Broadcast announcement
+        if: github.event.discussion.category.name == "Announcements"
         run: |
           echo 'New discussion!'
           echo "$GITHUB"
           echo "$GITHUB_EVENT"
           cat "$GITHUB_EVENT_PATH"
+
