@@ -26,6 +26,7 @@ jobs:
             from rich.emoji import Emoji as E
             print(E.replace(sys.argv[1]))
           EOF
+          sed -i 's/^[ \t]*//' emoji-convert.py
           chmod +x emoji-convert.py
 
       - name: 📣 Broadcast announcement
