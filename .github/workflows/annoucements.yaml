@@ -14,23 +14,11 @@ jobs:
         run: |
           TITLE="$(jq -er '.discussion.title' "$GITHUB_EVENT_PATH")"
           BODY="$(jq -er '.discussion.body' "$GITHUB_EVENT_PATH")"
-          URL="$(jq -er '"https://github.com/" + .discussion.html_url' "$GITHUB_EVENT_PATH")"
+          URL="$(jq -er '.discussion.html_url' "$GITHUB_EVENT_PATH")"
           echo -e "New announcement: ${TITLE}\n${BODY}\nURL: ${URL}" >&2
           echo "::set-output name=title::${TITLE}"
           echo "::set-output name=body::${BODY}"
           echo "::set-output name=url::${URL}"
-
-      # - id: initial
-      #   uses: juztcode/gitter-github-action@v1
-      #   if: success()
-      #   with:
-      #     room-id: ${{ secrets.GITTER_ROOM_ID }}
-      #     token: ${{ secrets.GITTER_PERSONAL_ACCESS_TOKEN }}
-      #     text: |
-      #       ** 📣 ${{ steps.annoucement.outputs.announcement-title }}**
-      #       ${{ steps.annoucement.outputs.announcement-body }}
-      #
-      #       url: ${{ steps.annoucement.outputs.announcement-url }}
 
       - name: Send notification to Matrix channel
         id: matrix-chat-message
@@ -43,4 +31,4 @@ jobs:
             ** 📣 ${{ steps.announcement.outputs.title }}**
             ${{ steps.announcement.outputs.body }}
 
-            url: ${{ steps.announcement.outputs.url }}
+            ${{ steps.announcement.outputs.url }}
