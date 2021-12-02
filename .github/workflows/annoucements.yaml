@@ -9,13 +9,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 📣 Broadcast announcement
+        id: announcement
         if: github.event.discussion.category.name == "Announcements"
         run: |
-          echo 'New discussion!'
-          echo "$GITHUB"
-          echo "$GITHUB_EVENT"
-          cat "$GITHUB_EVENT_PATH"
+          # echo 'New discussion!'
+          # echo "$GITHUB"
+          # echo "$GITHUB_EVENT"
+          # cat "$GITHUB_EVENT_PATH"
           TITLE=$(jq -er '.discussion.title' "$GITHUB_EVENT_PATH")
           BODY=$(jq -er '.discussion.body' "$GITHUB_EVENT_PATH")
+          echo "New announcement: $TITLE -> $BODY" >&2
+          echo "::set-output name=announcement-title::${TITLE}"
+          echo "::set-output name=announcement-body::${BODY}"
 
-          echo "New announcement: $TITLE -> $BODY"
+      - id: initial
+        uses: juztcode/gitter-github-action@v1
+        if: success()
+        with:
+          room-id: ${{ secrets.GITTER_ROOM_ID }}
+          token: ${{ secrets.GITTER_TOKEN }}
+          text: ${{ steps.annoucement.outputs.title }}
