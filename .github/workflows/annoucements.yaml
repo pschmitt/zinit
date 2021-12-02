@@ -15,4 +15,7 @@ jobs:
           echo "$GITHUB"
           echo "$GITHUB_EVENT"
           cat "$GITHUB_EVENT_PATH"
+          TITLE=$(jq -er '.discussion.title' "$GITHUB_EVENT_PATH")
+          BODY=$(jq -er '.discussion.body' "$GITHUB_EVENT_PATH")
 
+          echo "New announcement: $TITLE -> $BODY"
