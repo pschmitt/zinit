@@ -13,7 +13,7 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: 💰 Install rich and create emoji-convert.py
+      - name: 💰 Install rich 10.15.2
         run: |
           pip install rich==10.15.2
 
@@ -26,6 +26,7 @@ jobs:
             from rich.emoji import Emoji as E
             print(E.replace(sys.argv[1]))
           EOF
+          # Remove leading whitespace
           sed -i 's/^[ \t]*//' emoji-convert.py
           chmod +x emoji-convert.py
 
@@ -60,6 +61,7 @@ jobs:
           channel: '!TUvDMcvtEjDISwdmaq:gitter.im'
           message: |
             **📣 ${{ env.TITLE }}**
+
             ${{ env.BODY }}
 
             ${{ env.URL }}
