@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: 📣 Broadcast announcement
         id: announcement
-        if: github.event.discussion.category.name == "Announcements"
+        if: ${{ github.event.discussion.category.name == "Announcements" }}
         run: |
           # echo 'New discussion!'
           # echo "$GITHUB"
