@@ -20,7 +20,7 @@ jobs:
           echo "::set-output name=body::${BODY}"
           echo "::set-output name=url::${URL}"
 
-      - name: Send notification to Matrix channel
+      - name: ⏩ Send notification to Gitter channel
         id: matrix-chat-message
         uses: fadenb/matrix-chat-message@v0.0.6
         with:
