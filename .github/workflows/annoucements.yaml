@@ -8,6 +8,26 @@ jobs:
   gitter-im-broadcast:
     runs-on: ubuntu-latest
     steps:
+      - name: 🐍 Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: 💰 Install rich and create emoji-convert.py
+        run: |
+          pip install rich==10.15.2
+
+      - name: 🤣 Create emoji-convert.py
+        run: |
+          cat <<EOF > emoji-convert.py
+          #!/usr/bin/env python3
+          # coding: utf-8
+          import sys
+          from rich.emoji import Emoji as E
+          print(E.replace(sys.argv[1]))
+          EOF
+          chmod +x emoji-convert.py
+
       - name: 📣 Broadcast announcement
         id: announcement
         if: ${{ github.event.discussion.category.name == 'Announcements' }}
@@ -19,15 +39,15 @@ jobs:
           echo -e "New announcement: ${TITLE}\n${BODY}\nURL: ${URL}" >&2
 
           echo "TITLE<<EOF" >> $GITHUB_ENV
-          echo "$TITLE" >> $GITHUB_ENV
+          emoji-convert.py "$TITLE" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
           echo "BODY<<EOF" >> $GITHUB_ENV
-          echo "$BODY" >> $GITHUB_ENV
+          emoji-convert.py "$BODY" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
           echo "URL<<EOF" >> $GITHUB_ENV
-          echo "$URL" >> $GITHUB_ENV
+          emoji-convert.py "$URL" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: ⏩ Send notification to Gitter channel
