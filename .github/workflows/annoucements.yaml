@@ -15,7 +15,7 @@ jobs:
           TITLE="$(jq -er '.discussion.title' "$GITHUB_EVENT_PATH")"
           BODY="$(jq -er '.discussion.body' "$GITHUB_EVENT_PATH")"
           URL="$(jq -er '"https://github.com/" + .discussion.html_url' "$GITHUB_EVENT_PATH")"
-          echo "New announcement: ${TITLE}\n${BODY}\nURL: ${URL}" >&2
+          echo -e "New announcement: ${TITLE}\n${BODY}\nURL: ${URL}" >&2
           echo "::set-output name=announcement-title::${TITLE}"
           echo "::set-output name=announcement-body::${BODY}"
           echo "::set-output name=announcement-url::${URL}"
