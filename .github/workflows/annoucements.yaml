@@ -39,15 +39,15 @@ jobs:
           echo -e "New announcement: ${TITLE}\n${BODY}\nURL: ${URL}" >&2
 
           echo "TITLE<<EOF" >> $GITHUB_ENV
-          emoji-convert.py "$TITLE" >> $GITHUB_ENV
+          ./emoji-convert.py "$TITLE" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
           echo "BODY<<EOF" >> $GITHUB_ENV
-          emoji-convert.py "$BODY" >> $GITHUB_ENV
+          ./emoji-convert.py "$BODY" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
           echo "URL<<EOF" >> $GITHUB_ENV
-          emoji-convert.py "$URL" >> $GITHUB_ENV
+          ./emoji-convert.py "$URL" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: ⏩ Send notification to Gitter channel
