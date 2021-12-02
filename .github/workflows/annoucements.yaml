@@ -19,12 +19,12 @@ jobs:
 
       - name: 🤣 Create emoji-convert.py
         run: |
-          cat <<EOF > emoji-convert.py
-          #!/usr/bin/env python3
-          # coding: utf-8
-          import sys
-          from rich.emoji import Emoji as E
-          print(E.replace(sys.argv[1]))
+          cat << EOF > emoji-convert.py
+            #!/usr/bin/env python3
+            # coding: utf-8
+            import sys
+            from rich.emoji import Emoji as E
+            print(E.replace(sys.argv[1]))
           EOF
           chmod +x emoji-convert.py
 
