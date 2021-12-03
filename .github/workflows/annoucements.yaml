@@ -60,8 +60,8 @@ jobs:
           token: ${{ secrets.MATRIX_TOKEN }}
           channel: '!TUvDMcvtEjDISwdmaq:gitter.im'
           message: |
+            ${{ env.URL }}
+
             # 📣 ${{ env.TITLE }}
 
             ${{ env.BODY }}
-
-            ${{ env.URL }}
