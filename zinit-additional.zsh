@@ -40,6 +40,7 @@
 # $3 - id - URL or plugin ID or alias name (from id-as'')
 .zinit-service() {
     emulate -LR zsh
+    echo TEST: this should trigger a pipeline failure.
     setopt extendedglob warncreateglobal typesetsilent noshortloops
 
     local ___tpe="$1" ___mode="$2" ___id="$3" ___fle="${ZINIT[SERVICES_DIR]}/${ICE[service]}.lock" ___fd ___cmd ___tmp ___lckd ___strd=0
