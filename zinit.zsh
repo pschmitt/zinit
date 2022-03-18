@@ -1880,6 +1880,7 @@ builtin setopt noaliases
 # Deploys a sub-prompt message to be displayed OR a `zle
 # .reset-prompt' call to be invoked
 +zinit-deploy-message() {
+    echo please change me 
     [[ $1 = <-> && ( ${#} = 1 || ( $2 = (hup|nval|err) && ${#} = 2 ) ) ]] && { zle && {
             local alltext text IFS=$'\n' nl=$'\n'
             repeat 25; do read -r -u"$1" text; alltext+="${text:+$text$nl}"; done
